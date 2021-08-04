@@ -375,7 +375,7 @@ credentials <- data.frame(
                     <a href='https://www.dana-farber.org'> Dana-Farber Cancer Institute </a> and 
                     <a href='https://hms.harvard.edu'> Harvard Medical School</a>. Please email Dr. Chouchani (edwardt_chouchani@dfci.harvard.edu) if you have questions for this website."),
                HTML("<p> The web application is developed by Haopeng Xiao and Jiaming Li from the <a href='https://chouchanilab.dana-farber.org/'> Chouchani</a> and 
-               <a href='https://gygi.hms.harvard.edu/index.html'> Gygi</a> labs, the source codes are deposited in GitHub (<a href='https://github.com/Angrycodeboy'>https://github.com/Angrycodeboy</a>)."),
+               <a href='https://gygi.hms.harvard.edu/index.html'> Gygi</a> labs, the source codes are deposited on GitHub (<a href='https://github.com/Angrycodeboy'>https://github.com/Angrycodeboy/DOBAT</a>)."),
                HTML("<p> This project is funded by <a href='https://www.calicolabs.com'> Calico Life Sciences LLC</a> and 
                     <a href='https://www.nih.gov'> National Institute of Health</a>.")
                
@@ -399,7 +399,7 @@ credentials <- data.frame(
       "Welcome to ProPhysDOBAT!"
     })
     output$image_tab1 <- renderImage({
-        list(src="data/ProphysDOBAT.png",width=200,height=180)
+        list(src="data/final/ProphysDOBAT.png",width=200,height=180)
       },
     deleteFile = FALSE)
     output$Abstract<-renderText({
