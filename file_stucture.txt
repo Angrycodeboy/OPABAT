@@ -1,0 +1,59 @@
+.:
+app
+docker-compose.yml
+Dockerfile
+DO_shiny.Rproj
+file_stucture.txt
+shiny.conf
+
+./app:
+data
+global.R
+server.R
+ui.R
+www
+
+./app/data:
+final
+
+./app/data/final:
+all_edges_visnetwork.tsv
+corum_accessory_edge.tsv
+corum_filter.tsv
+db_edges.tsv
+df2_melt_abundance.feather
+dft_transposed_abundance.feather
+gene_protein_list.csv
+human_BAT_cor.csv
+human_pheno.csv
+human_TPM_mapped.tsv
+legends_corum.png
+legends_network4.png
+OPABAT.png
+pearson_protein_phenotypic.csv
+pearson_protein_phenotypic_only_sig.csv
+physiological.csv
+Screen Shot 2021-07-20 at 11.17.42 AM.png
+strain_selection.csv
+
+./app/www:
+(10) Protein_QTLs.csv
+(11) Human_SCVAT.csv
+(12) Human_SAT.csv
+(13) Disease_networks.csv
+(1) Protein_expression.csv
+(2) Mouse_lookup_table.csv
+(3) Edges_in_DOBAT_network.csv
+(4) New_accessory_proteins_to_corum_complexes.tsv
+(5) New_accessory_proteins_to_KEGG_pathways.csv
+(6) Physiological_data.csv
+(7) Protein_physiological_data_correlations.csv
+(8) Strains_for_phenotypes.csv
+(9) Phenotype_QTLs.csv
+complex.mp4
+correlation.mp4
+expression.mp4
+human data.mp4
+network.mp4
+phenotypes.mp4
+strains.mp4
