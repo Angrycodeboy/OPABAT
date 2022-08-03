@@ -1,4 +1,3 @@
-###### server below ######
 server <- function(input, output, session) {
   result_auth <- secure_server(check_credentials = check_credentials(credentials))
   
@@ -21,13 +20,13 @@ server <- function(input, output, session) {
     if(length(uni_text1)==0){
       print("Please click to select an official gene symbol from the typing helper menu.")
     }else{
-      protein_text1<-dft[,uni_text1]
-      length_text1<-length(protein_text1[!is.na(protein_text1)])
-      if(length_text1!=0){
-        paste0(gene_text1, " was quantified in ", length_text1," out of 163 DO mice BAT.")
-      }else{
-        paste0(gene_text1, " was not quantified.")}
-    }})
+    protein_text1<-dft[,uni_text1]
+    length_text1<-length(protein_text1[!is.na(protein_text1)])
+    if(length_text1!=0){
+      paste0(gene_text1, " was quantified in ", length_text1," out of 163 DO mice BAT.")
+    }else{
+      paste0(gene_text1, " was not quantified.")}
+  }})
   
   output$expression_plot<-renderPlot({
     gene_plot1<-toupper(re_tab1())
@@ -36,33 +35,33 @@ server <- function(input, output, session) {
     if(length(uni_plot1)==0){
       print("Please use official gene symbol found on UniProt (uniprot.org).")
     }else{
-      df_plot1<-df2[df2$uni==uni_plot1,]
-      df_plot1$Sample_ID1<-paste0(df_plot1$M,"_",df_plot1$ID)
-      df_p_plot1<-df_p[,c("Sample_ID1",pheno)]
-      data_plot1<-left_join(df_plot1,df_p_plot1,by="Sample_ID1")
+    df_plot1<-df2[df2$uni==uni_plot1,]
+    df_plot1$Sample_ID1<-paste0(df_plot1$M,"_",df_plot1$ID)
+    df_p_plot1<-df_p[,c("Sample_ID1",pheno)]
+    data_plot1<-left_join(df_plot1,df_p_plot1,by="Sample_ID1")
+    
+    if (pheno=="age"){
+      ggplot(data_plot1,aes(x=ID,y=value))+
+      geom_point(aes(color=get(pheno)))+
+      scale_color_manual(values=c("blue","gold"))+
+      geom_line(data=data_plot1[!is.na(data_plot1$value),])+
+      ylab("rel. protein abundance (log2 TMT S/N (sample/bridge)")+
+      xlab("mouse ID")+
+      labs(color=pheno)+
+      theme_bw()
+    }else{
+      ggplot(data_plot1,aes(x=ID,y=value))+
+        geom_point(aes(color=get(pheno)))+
+        scale_color_gradient(low="blue",high="gold")+
+        geom_line(data=data_plot1[!is.na(data_plot1$value),])+
+        ylab("rel. protein abundance (log2 TMT S/N (sample/bridge)")+
+        xlab("mouse ID")+
+        labs(color=pheno)+
+        theme_bw()
+    }
       
-      if (pheno=="age"){
-        ggplot(data_plot1,aes(x=ID,y=value))+
-          geom_point(aes(color=get(pheno)))+
-          scale_color_manual(values=c("blue","gold"))+
-          geom_line(data=data_plot1[!is.na(data_plot1$value),])+
-          ylab("rel. protein abundance (log2 TMT S/N (sample/bridge)")+
-          xlab("mouse ID")+
-          labs(color=pheno)+
-          theme_bw()
-      }else{
-        ggplot(data_plot1,aes(x=ID,y=value))+
-          geom_point(aes(color=get(pheno)))+
-          scale_color_gradient(low="blue",high="gold")+
-          geom_line(data=data_plot1[!is.na(data_plot1$value),])+
-          ylab("rel. protein abundance (log2 TMT S/N (sample/bridge)")+
-          xlab("mouse ID")+
-          labs(color=pheno)+
-          theme_bw()
-      }
-      
-    }}, res = 96)
-  
+  }}, res = 96)
+
   
   ## below is for tab2
   re <-eventReactive( input$go,{c(isolate(input$gene1),isolate(input$gene2))})
@@ -104,10 +103,10 @@ server <- function(input, output, session) {
     if(length_text3==0){
       paste0(gene_text3," has no significant correlator.")
     }else{
-      paste0(gene_text3,"'s first-degree neighboring network contains ",length_text3," significant correlators. 
-             Zoom in and hover over nodes to see gene symbol and protein description. Hover over edges to see 
-             correlation strength and evidence of protein-protein interaction in the literature. Reload the page
-             if very large networks slow down the website.")}
+    paste0(gene_text3,"'s first-degree neighboring network contains ",length_text3," significant correlators. 
+            Zoom in and hover over nodes to see gene symbol and protein description. Hover over edges to see 
+            correlation strength and evidence of protein-protein interaction in the literature. Reload the page
+            if very large networks slow down the website.")}
   })
   output$plot_tab3 <- renderVisNetwork({
     gene_plot3<-toupper(re_tab3())
@@ -118,29 +117,29 @@ server <- function(input, output, session) {
       nodes<-as.data.frame(NULL)
       edges<-as.data.frame(NULL)
       visNetwork(nodes, edges)
-    }else{
-      nodes<-unique(c(edges$from,edges$to))
-      nodes<-as.data.frame(nodes)%>%dplyr::rename("label"="nodes")
-      nodes$id<-nodes$label
-      nodes$shape<-"circle"
-      nodes<-left_join(nodes,db0[,4:5],by=c("label"="gene"))
-      nodes<-nodes%>%dplyr::rename("title"="Description")
-      nodes<-nodes%>%mutate(color=case_when(
-        label==gene_plot3~"darkred",
-        TRUE~"orange"
-      ))
-      edges<-edges[,-3]
-      edges$width<-nrow(edges)/30
-      nodes$value<-nrow(edges)/8
-      nodes<-nodes%>%arrange(id)
-      nodes$font.color<-"black"
-      visNetwork(nodes, edges)%>%
-        visIgraphLayout(layout = "layout_in_circle") %>%
-        visNodes(size = nodes$value,label=nodes$label) %>%
-        visOptions(highlightNearest = list(enabled = T, hover = T), 
-                   nodesIdSelection = T)
-    }
-  })
+      }else{
+    nodes<-unique(c(edges$from,edges$to))
+    nodes<-as.data.frame(nodes)%>%dplyr::rename("label"="nodes")
+    nodes$id<-nodes$label
+    nodes$shape<-"circle"
+    nodes<-left_join(nodes,db0[,4:5],by=c("label"="gene"))
+    nodes<-nodes%>%dplyr::rename("title"="Description")
+    nodes<-nodes%>%mutate(color=case_when(
+      label==gene_plot3~"darkred",
+      TRUE~"orange"
+    ))
+    edges<-edges[,-3]
+    edges$width<-nrow(edges)/30
+    nodes$value<-nrow(edges)/8
+    nodes<-nodes%>%arrange(id)
+    nodes$font.color<-"black"
+    visNetwork(nodes, edges)%>%
+      visIgraphLayout(layout = "layout_in_circle") %>%
+      visNodes(size = nodes$value,label=nodes$label) %>%
+      visOptions(highlightNearest = list(enabled = T, hover = T), 
+                  nodesIdSelection = T)
+  }
+      })
   output$image_tab3 <- renderImage({
     gene_image3<-toupper(re_tab3())
     edge_extract1<-all_edges[all_edges$from==gene_image3,]
@@ -213,25 +212,25 @@ server <- function(input, output, session) {
       }
     }
     if(length(length_subunits)>0){
-      sub_table<-corum_filter[length_subunits, ][,c(2,3,4,5,6,9,11)]
-      sub_table$p_adj_BH<-gsubfn("([0-9.]+)", ~format(round(as.numeric(x), 2), nsmall=2), sub_table$p_adj_BH)
-      sub_table$p_adj_BH<-gsubfn("([0-9.]+)", ~format(round(as.numeric(x), 2), nsmall=0), sub_table$p_adj_BH)
-      rownames(sub_table)<-NULL
-      sub_table$subunits.Gene.name.<-gsub(";"," ",sub_table$subunits.Gene.name.)
-      sub_table$protein<-gsub(";"," ",sub_table$protein)
-      sub_table$p_adj_BH<-gsub(";"," ",sub_table$p_adj_BH)
-      sub_table<-sub_table%>%
-        dplyr::rename("CORUM.ID"="ComplexID",
-                      "New.Accessory.Count"="new_member",
-                      "Subunit.Count"="subunits_count",
-                      "Subunits"="subunits.Gene.name.",
-                      "New.Accessory.Proteins"="protein",
-                      "p.adj.BH"="p_adj_BH")
-      DT::datatable( sub_table, options = list(autoWidth = TRUE,
-                                               columnDefs = list(list(targets=c(3), visible=TRUE, width='300px'),
-                                                                 list(targets=c(4), visible=TRUE, width='300px'),
-                                                                 list(targets=c(5), visible=TRUE, width='300px'),
-                                                                 list(className = 'dt-center',targets = c(1,2,6,7)))))
+    sub_table<-corum_filter[length_subunits, ][,c(2,3,4,5,6,9,11)]
+    sub_table$p_adj_BH<-gsubfn("([0-9.]+)", ~format(round(as.numeric(x), 2), nsmall=2), sub_table$p_adj_BH)
+    sub_table$p_adj_BH<-gsubfn("([0-9.]+)", ~format(round(as.numeric(x), 2), nsmall=0), sub_table$p_adj_BH)
+    rownames(sub_table)<-NULL
+    sub_table$subunits.Gene.name.<-gsub(";"," ",sub_table$subunits.Gene.name.)
+    sub_table$protein<-gsub(";"," ",sub_table$protein)
+    sub_table$p_adj_BH<-gsub(";"," ",sub_table$p_adj_BH)
+    sub_table<-sub_table%>%
+      dplyr::rename("CORUM.ID"="ComplexID",
+                    "New.Accessory.Count"="new_member",
+                    "Subunit.Count"="subunits_count",
+                    "Subunits"="subunits.Gene.name.",
+                    "New.Accessory.Proteins"="protein",
+                    "p.adj.BH"="p_adj_BH")
+    DT::datatable( sub_table, options = list(autoWidth = TRUE,
+                                              columnDefs = list(list(targets=c(3), visible=TRUE, width='300px'),
+                                                                list(targets=c(4), visible=TRUE, width='300px'),
+                                                                list(targets=c(5), visible=TRUE, width='300px'),
+                                                                list(className = 'dt-center',targets = c(1,2,6,7)))))
     }else{
       DT::datatable(NULL)
     }
@@ -272,10 +271,10 @@ server <- function(input, output, session) {
                       "New.Accessory.Proteins"="protein",
                       "p.adj.BH"="p_adj_BH")
       DT::datatable( acc_table, options = list(autoWidth = TRUE,
-                                               columnDefs = list(list(targets=c(3), visible=TRUE, width='300px'),
-                                                                 list(targets=c(4), visible=TRUE, width='300px'),
-                                                                 list(targets=c(5), visible=TRUE, width='300px'),
-                                                                 list(className = 'dt-center',targets = c(1,2,6,7)))))
+                                                columnDefs = list(list(targets=c(3), visible=TRUE, width='300px'),
+                                                                  list(targets=c(4), visible=TRUE, width='300px'),
+                                                                  list(targets=c(5), visible=TRUE, width='300px'),
+                                                                  list(className = 'dt-center',targets = c(1,2,6,7)))))
     }else{
       DT::datatable(NULL)
     }
@@ -288,8 +287,8 @@ server <- function(input, output, session) {
     gene_text4<-re_tab4()
     new_member_tab4<-corum_filter[corum_filter$identifier==gene_text4,]$new_member
     paste0("Corum complex ",gene_text4," has ",new_member_tab4, " new accessory proteins identified in OPABAT network. 
-             Networks with over 80 members may take longer to show up. Reload the page if very large networks slow down 
-             the website.")
+            Networks with over 80 members may take longer to show up. Reload the page if very large networks slow down 
+            the website.")
   })
   output$plot_tab4 <- renderVisNetwork({
     gene_plot4<-re_tab4()
@@ -336,24 +335,24 @@ server <- function(input, output, session) {
     temp1<-as.data.frame(t(temp_t2))%>%unite("edge",c("V1","V2"))
     temp3<-inner_join(all_edges,temp1,by=c("label"="edge"))%>%
       mutate(color="orange",
-             dashes=FALSE)
+              dashes=FALSE)
     ##construct final edge table
     edges_plot4<-rbind(temp2,temp3)
     edges_plot4<-edges_plot4[!duplicated(edges_plot4$label),]%>%select(-value,-label)
-    ##construct node table##
+  ##construct node table##
     # for corum members#
     nodes_members_plot4 <- data.frame(id = complex_member_plot4,
-                                      label = complex_member_plot4,
-                                      color = "darkred")
+                        label = complex_member_plot4,
+                        color = "darkred")
     nodes_members_plot4_1<-left_join(nodes_members_plot4,db0,by=c("id"="gene"))%>%
       select(id,label,color,Description)%>%
       mutate(title = paste0("<p><b>", "corum complex member"," ",Description, "</b><br>"))%>%
       select(-Description)
     # for accessory proteins#
     nodes_accessory_plot4 <- data.frame(id = new_members_plot4,
-                                        label = new_members_plot4,
-                                        color = "darkred",
-                                        identifier=complex_name_plot4)%>%
+                                      label = new_members_plot4,
+                                      color = "darkred",
+                                      identifier=complex_name_plot4)%>%
       unite("match",c("identifier","label"),remove=F)
     nodes_accessory_plot4a<-left_join(nodes_accessory_plot4,corum_accessor_p,by="match")%>%
       mutate( color="orange")%>%
@@ -373,12 +372,12 @@ server <- function(input, output, session) {
       visIgraphLayout(layout = "layout_in_circle") %>%
       visNodes(size = node_plot4$value,label=node_plot4$label) %>%
       visOptions(highlightNearest = list(enabled = T, hover = T), 
-                 nodesIdSelection = T)
+                  nodesIdSelection = T)
     
   })
   output$image_tab4 <- renderImage({
     gene_image4<-re_tab4()
-    list(src="data/final/legends_corum.png",width=300,height=70)
+      list(src="data/final/legends_corum.png",width=300,height=70)
   },
   deleteFile = FALSE)
   
@@ -392,7 +391,7 @@ server <- function(input, output, session) {
       dplyr::filter(PearsonR >=0.4|PearsonR <=-0.4)
     cor_number_tab5<-nrow(df_tab5)
     paste0("Physiological parameter ",pheno_tab5," has ",cor_number_tab5, " significant protein correlators (Pearson r ≥ 0.4 or ≤ -0.4, p<0.05, Mouse Number ≥ 81).")
-  })
+    })
   output$pos_table <- DT::renderDataTable({
     pheno_tab5_a<-re_tab5()
     #test pheno_tab5_a<-"body.weight"
@@ -454,10 +453,10 @@ server <- function(input, output, session) {
                                   fill = "gray"),
                 xlab = paste0("rel. abundance of ",gene_plot5a), ylab = paste0("z-scored value of ",pheno5a))
     }}, res = 96)
+
   
   
-  
-  #below is for tab6- Strain selection#
+#below is for tab6- Strain selection#
   re_tab6 <-eventReactive( input$go_tab6,{input$dropdown_tab6})
   output$text_tab6<-renderText({
     pheno_tab6<-re_tab6()
@@ -528,7 +527,7 @@ server <- function(input, output, session) {
       hit_params<-toString(dfp_sig_pro1_t1$params)
       
       paste0(gene_text7a, " is a OPABAT protein-phenotype correlator of ", hit_params, ". Currently displaying its human SCVAT transcript-phenotype correlation.")}
-  })
+    })
   
   output$plot_tab7a<-renderPlot({
     gene_plot7a<-toupper(re_tab7a())
@@ -548,7 +547,7 @@ server <- function(input, output, session) {
       df_plot7_transcript_t<-as.data.frame(t(df_plot7_transcript))
       df_plot7_transcript_t$"Study.ID"<-rownames(df_plot7_transcript_t)
       df_plot7_transcript_t1<-df_plot7_transcript_t[-1,]
-      
+
       data_plot7a<-left_join(df_plot7_transcript_t1,df_plot7_pheno1,by="Study.ID")
       data_plot7a$V1.x<-as.numeric(data_plot7a$V1.x)
       
@@ -563,8 +562,8 @@ server <- function(input, output, session) {
                 xlab = paste0("rel. abundance (TPM) of ",gene_plot7a), ylab = paste0("z-scored value of ",pheno7a))
     }}, res = 96)   
   
-  
-  ###tab 8 below###
+      
+###tab 8 below###
   output$download1<-renderText({
     "(1) BAT protein expression data across the whole DO cohort."
   })
@@ -620,5 +619,7 @@ server <- function(input, output, session) {
   
 }
 
-shinyApp(ui, server)
-
+#gene_text3="CKB"
+#pheno<-"age"
+#x1="UCP1"
+#x2="CKB"

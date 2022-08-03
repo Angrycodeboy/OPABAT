@@ -7,16 +7,19 @@ library(dqshiny)
 library(DT)
 library(gsubfn)
 library(shinymanager)
+library(feather)
 
 ##read in necessary tables##
 # (1) gene to uni lookup list
 db0<-read.csv("data/final/gene_protein_list.csv",header=T,stringsAsFactors = F)
 
 # (2) transposed protein abundance data
-dft<-read.table("data/final/dft_transposed_abundance.csv",sep=",",row.names=1,header=T,stringsAsFactors = F)
+dft<-read_feather("data/final/dft_transposed_abundance.feather")
+#dft<-read.table("data/final/dft_transposed_abundance.csv",sep=",",row.names=1,header=T,stringsAsFactors = F)
 
 # (3) melted protein abundance data
-df2<-read.delim("data/final/df2_melt_abundance.tsv",header=T,stringsAsFactors = F)
+df2<-read_feather("data/final/df2_melt_abundance.feather")
+#df2<-read.delim("data/final/df2_melt_abundance.tsv",header=T,stringsAsFactors = F)
 
 # (4)phenotypic data#
 df_p<-read.csv("data/final/physiological.csv",header=T,stringsAsFactors = F)
@@ -90,5 +93,3 @@ credentials <- data.frame(
   # comment = c("protein","physiology"), %>% 
   stringsAsFactors = FALSE
 )
-
-
