@@ -19,7 +19,7 @@ dft<-read.table("data/final/dft_transposed_abundance.csv",sep=",",row.names=1,he
 df2<-read.delim("data/final/df2_melt_abundance.tsv",header=T,stringsAsFactors = F)
 
 # (4)phenotypic data#
-df_p<-read.csv("data/physiological.csv",header=T,stringsAsFactors = F)
+df_p<-read.csv("data/final/physiological.csv",header=T,stringsAsFactors = F)
 #names for phenotypic data
 names<-c(names(df_p[,13:45]),"age")
 
@@ -27,7 +27,7 @@ names<-c(names(df_p[,13:45]),"age")
 db<-read.delim("data/final/db_edges.tsv",header=T,stringsAsFactors = F)
 
 # (6) edge info for visnetwork
-all_edges<-read.delim("data/final/all_edges_visnetwork.tsv",header=T,stringsAsFactors = F)
+#all_edges<-read.delim("data/final/all_edges_visnetwork.tsv",header=T,stringsAsFactors = F)
 
 # (7) edge info for visnetwork
 all_edges<-read.delim("data/final/all_edges_visnetwork.tsv",header=T,stringsAsFactors = F)
@@ -43,14 +43,21 @@ corum_accessor_p<-read.delim("data/final/corum_accessory_edge.tsv",header=T,stri
 #(10) phenotype-protein-correlation table
 df_pcor<-read.csv("data/final/pearson_protein_phenotypic.csv",header=T,stringsAsFactors = F)
 
+#(11) strain selection table
+df_strain<-read.csv("data/final/strain_selection.csv",header=T,stringsAsFactors = F)
+#names for phenotypic data
+names1<-unique(df_strain$Parameter)
 
-##files to download##
-d1<-read.csv("download/(1) Protein_expression.csv",header=T)
-d2<-read.csv("download/(2) Mouse_lookup_table.csv",header=T)
-d3<-read.csv("download/(3) Edges_in_DOBAT_network.csv",header=T)
-d4<-read.delim("download/(4) New_accessory_proteins_to_corum_complexes.tsv",header=T)
-d5<-read.csv("download/(5) Physiological_data.csv",header=T)
-d6<-read.csv("download/(6) Protein_physiological_data_correlations.csv",header=T)
+#(12) human BAT table
+df_human_BAT<-read.delim("data/final/human_TPM_mapped.tsv",header=T,stringsAsFactors = F)
+df_human_pheno<-read.csv("data/final/human_pheno.csv",header=T,stringsAsFactors = F)
+df_human_cor<-read.csv("data/final/human_BAT_cor.csv",header=T,stringsAsFactors = F)
+#names for phenotypic data
+names_BAT<-sort(colnames(df_human_pheno))
+dfp_sig<-read.csv("data/final/pearson_protein_phenotypic_only_sig.csv",header=T,stringsAsFactors = F)
+
+
+
 
 
 
@@ -92,58 +99,57 @@ credentials <- data.frame(
 
   ui <-    secure_app(head_auth = tags$script(inactivity), 
                       fluidPage(
-    navlistPanel(
+    navlistPanel(#widths = c(4, 6),
 
       #tab 0 Homepage
       tabPanel(titlePanel("Home"),
-      textOutput("Welcome"),
-      tags$head(tags$style("#Welcome{color: Darkred;
-                                 font-size: 40px;
-                                 font-weight: bold;
-                                 }"
-      )
-      ),
-      textOutput("Abstract"),
-      tags$head(tags$style("#Abstract{color: Black;
-                                 font-size: 15px;
-                                 }"
-      )
-      ),
-      #textOutput("Cite"),
-      #tags$head(tags$style("#Cite{color: Blue;
-       #                          font-size: 15px;
-        #                         }"
-    #  )
-    #  ),
+       
+      tags$h1("Welcome to OPABAT!"),
+      HTML("Obesity is a polygenic disorder with variable penetrance in the general population. Brown adipose tissue (BAT) is a major regulator of energy expenditure and metabolic physiology 
+           due to a specialized proteome that orchestrates futile metabolic cycles, which could be leveraged to treat obesity. However, nearly all mechanistic studies of BAT protein function 
+           occur in a single inbred mouse strain, which has limited understanding of generalizable mechanisms of BAT regulation over metabolism. Here we perform deep quantitative multiplexed 
+           proteomics of BAT across a cohort of 163 genetically defined Diversity Outbred (DO) mice, a model that parallels the genetic and phenotypic variation found in the human population. 
+           Leveraging the high variation afforded by this model, we define the functional architecture of the outbred BAT proteome, comprising 10,479 proteins. In doing so, we assign novel 
+           co-operative functions to 2,578 proteins with 780 established protein networks. We demonstrate that this analytic framework enables systematic discovery of regulators of BAT function, 
+           exemplified by uncovering SFXN5 and LETMD1 as modulators of UCP1-dependent thermogenesis. We also identify 638 proteins that underlie protection from, or sensitivity to, at least one 
+           parameter of metabolic disease. From this basis, we identify the Na+/K+-ATPase α2 subunit as an inhibitor of BAT energy expenditure, that increases adiposity through antagonism of 
+           calcium influx-dependent activation of thermogenic effectors. We provide this Outbred Proteomic Architecture of BAT (OPABAT) as a resource to understanding conserved mechanisms of 
+           BAT regulation over metabolic physiology."),
       tags$h1("Citation"),
-      HTML("<p>If this website is useful to you, please consider citing <a href='https://www.sciencedirect.com/science/article/pii/S0092867420301562?via%3Dihub'> 'space holder-ProPhysDOBAT' </a>!</p>"),
+      HTML("<p>If this website is useful to you, please consider citing <a href='https://www.sciencedirect.com/science/article/pii/S0092867420301562?via%3Dihub'> 'space holder-OPABAT' </a>!</p>"),
       
       imageOutput("image_tab1"),
       ),
     #tab 0.5 Tour guide
     tabPanel(titlePanel("Tour Guide"),
              h2("Explore what we have prepared for you on this website!"),
-             h4("(Please check cookie settings or switch to Chrome/Firefox if videos cannot be loaded correctly)"),
-             h3("Expressions"),
-             h5("Select a protein to see its expression level in DO BAT, and color mice by phenotypic data."),
+             h4("(Please check cookie settings or switch to Chrome/Firefox if videos cannot be loaded correctly, and use full screen mode if videos have resolution issues on PCs.)"),
+             h3("Expression"),
+             h5("Select a protein to see its expression level in OPABAT, and color mice by phenotypic data."),
              tags$video(id="video1", width="400px",height="400px",type = "video/mp4",src = "expression.mp4", controls = "controls"),
              h3("Correlations"),
-             h5("Select any two proteins to see the correlation between their expression levels in DO BAT."),
+             h5("Select any two proteins to see the correlation between their expression levels in OPABAT."),
              tags$video(id="video2", width="400px",height="400px",type = "video/mp4",src = "correlation.mp4", controls = "controls"),
              h3("Networks"),
-             h5("Select a protein to explore its significant immediate correlators in DO BAT network."),
+             h5("Select a protein to explore its significant immediate correlators in OPABAT network."),
              tags$video(id="video3", width="400px",height="400px",type = "video/mp4",src = "network.mp4", controls = "controls"),
              h3("Complexes"),
-             h5("Select a protein or a CORUM core complex to explore new accesory proteins to established protein complexes identified in DO BAT network."),
+             h5("Select a protein or a CORUM core complex to explore new accesory proteins to established protein complexes identified in OPABAT network."),
              tags$video(id="video4", width="400px",height="400px",type = "video/mp4",src = "complex.mp4", controls = "controls"),
              h3("Phenotypes"),
              h5("Explore the positive and negative protein correlators of each physiological parameter."),
-             tags$video(id="video5", width="400px",height="400px",type = "video/mp4",src = "phenotypes.mp4", controls = "controls")
+             tags$video(id="video5", width="400px",height="400px",type = "video/mp4",src = "phenotypes.mp4", controls = "controls"),
+             h3("Strain Selection"),
+             h5("Explore strains that are best candidates to model phenotypes."),
+             tags$video(id="video5", width="400px",height="400px",type = "video/mp4",src = "strains.mp4", controls = "controls"),
+             h3("Human Data"),
+             h5("Explore correlations between human phenotypes and BAT transcript abundance of all OPABAT metabolic physiology correlators."),
+             tags$video(id="video5", width="400px",height="400px",type = "video/mp4",src = "human data.mp4", controls = "controls")
              #test-tags$img(width="50%",src = "image-in-app.png")
     ),
       #tab 1 protein expression
       tabPanel(
-        titlePanel("Expressions"),
+        titlePanel("Expression"),
         textOutput("expression_description"),
         # input gene
         autocomplete_input(id="gene_tab1", 
@@ -151,9 +157,10 @@ credentials <- data.frame(
                            options=db0$gene, 
                            value = "", 
                            width = NULL,
-                           placeholder = "Type and select an official gene symbol", 
+                           placeholder = "Type in then select an official gene symbol", 
                            max_options = 0, 
-                           hide_values = FALSE),
+                           hide_values = FALSE,
+                           create = T),
         
         # select_phenotype
         selectInput(
@@ -187,17 +194,19 @@ credentials <- data.frame(
                            options=db0$gene, 
                            value = "", 
                            width = NULL,
-                           placeholder = "Type and select an official gene symbol", 
+                           placeholder = "Type in then select an official gene symbol", 
                            max_options = 0, 
-                           hide_values = FALSE),
+                           hide_values = FALSE,
+                           create = T),
         autocomplete_input(id="gene2", 
                            label="Gene2", 
                            options=db0$gene, 
                            value = "", 
                            width = NULL,
-                           placeholder = "Type and select an official gene symbol", 
+                           placeholder = "Type in then select an official gene symbol", 
                            max_options = 0, 
-                           hide_values = FALSE),
+                           hide_values = FALSE,
+                           create = T),
         actionButton("go", "see correlation",class = "btn-success"),
         textOutput("network"),
         plotOutput(outputId="plot",
@@ -217,9 +226,10 @@ credentials <- data.frame(
                                   options=db0$gene, 
                                   value = "", 
                                   width = NULL,
-                                  placeholder = "Type and select an official gene symbol", 
+                                  placeholder = "Type in then select an official gene symbol", 
                                   max_options = 0, 
-                                  hide_values = FALSE),
+                                  hide_values = FALSE,
+                                  create = T),
           actionButton("go_tab3", "see correlator network",class = "btn-success"),
           textOutput("text_tab3"),
           visNetworkOutput("plot_tab3",width = "90%", height = "600px"),
@@ -235,20 +245,21 @@ credentials <- data.frame(
                                                         options=db0$gene, 
                                                         value = "", 
                                                         width = NULL,
-                                                        placeholder = "Type and select an official gene symbol", 
+                                                        placeholder = "Type in then select an official gene symbol", 
                                                         max_options = 0, 
-                                                        hide_values = FALSE),
+                                                        hide_values = FALSE,
+                                                        create = T),
                                      actionButton("go_tab4a", "see complex assignment",class = "btn-success"),
                                      textOutput("text_tab4a"),
                                      tabsetPanel( 
                                        id = 'table_tab4',
-                                       tabPanel("Accessory to these complexes in DO BAT", DT::dataTableOutput("accessory_table",width = '100%')),
+                                       tabPanel("Accessory to these complexes in OPABAT", DT::dataTableOutput("accessory_table",width = '100%')),
                                        tabPanel("Subunit of these complexes in CORUM", DT::dataTableOutput("subunit_table",width = '100%'))
                                      )),
                             tabPanel("Complex-centric view",
                selectizeInput(
                  inputId="dropdown_tab4",
-                 label="Select or backspace and type in a Corum complex to see new accessory proteins in  DO BAT",
+                 label="Select or backspace and type in a Corum complex to see new accessory proteins in  OPABAT",
                  choices=corum_names,
                  selected = "181_26S proteasome",
                  multiple = FALSE,
@@ -286,13 +297,14 @@ credentials <- data.frame(
                           tabPanel("Protein-physiological parameter correlation",
                # input gene
                autocomplete_input(id="gene_tab5a", 
-                                  label="Type in and select a gene to see correaltion plots", 
+                                  label="Type in then select a gene to see correaltion plots", 
                                   options=db0$gene, 
                                   value = "", 
                                   width = NULL,
-                                  placeholder = "Type and select an official gene symbol", 
+                                  placeholder = "Type in then select an official gene symbol", 
                                   max_options = 0, 
-                                  hide_values = FALSE),
+                                  hide_values = FALSE,
+                                  create = T),
                
                # select_phenotype
                selectInput(
@@ -318,66 +330,229 @@ credentials <- data.frame(
                           inline = FALSE)
                
                ))),
+    
+    #tab 6 strain_selection
+    tabPanel(titlePanel("Strain Selection"),
+             HTML("<p> Please <a href='https://churchilllab.jax.org/qtlviewer/Chouchani/OPABAT'> click here </a> for full protein and phenotype QTL mapping results."),
+             tabsetPanel( id = 'tab6',
+                          tabPanel("Stran selection for phenotypes",
+                          selectizeInput(
+                            inputId="dropdown_tab6",
+                            label="Select a physiological parameter to see top mouse strain candidates",
+                            choices=names1,
+                            selected = "VO2 cold/day",
+                            multiple = FALSE,
+                            #selectize = TRUE,
+                            width = NULL,
+                            size = NULL
+                          ),
+                          actionButton("go_tab6", "see strain candidates",class = "btn-success"),
+                          textOutput("text_tab6"),
+                          tabsetPanel( 
+                            id = 'table_tab6',
+                            tabPanel("Homozygotes ranked by negative to positive contributions to a phenotype", DT::dataTableOutput("strain_table"))
+                          )))),
+    
+    #tab 7 Human data
+    tabPanel(titlePanel("Human Data"),
+             tabsetPanel( id = 'tab7',
+                          tabPanel("Transcripts of OPABAT correlators mapped in human SCVAT",
+                                   selectizeInput(
+                                     inputId="dropdown_tab7",
+                                     label="Select a physiological parameter to see top transcript correlators",
+                                     choices=names_BAT[!names_BAT%in%"Study.ID"],
+                                     selected = "BMI",
+                                     multiple = FALSE,
+                                     #selectize = TRUE,
+                                     width = NULL,
+                                     size = NULL
+                                   ),
+                                   actionButton("go_tab7", "see top transcript correlators",class = "btn-success"),
+                                   textOutput("text_tab7"),
+                                   tabsetPanel( 
+                                     id = 'table_tab7',
+                                     tabPanel("human SCVAT transcript correlators", DT::dataTableOutput("human_table"))
+                                   )),
+                          tabPanel("Transcript-phenotype correlation plots",
+                                   # input gene
+                                   autocomplete_input(id="gene_tab7a", 
+                                                      label="Type in then select a gene to see correaltion plots", 
+                                                      options=df_human_BAT$Gene.symbol,
+                                                      value = "", 
+                                                      width = NULL,
+                                                      placeholder = "Type in then select an official gene symbol", 
+                                                      max_options = 0, 
+                                                      hide_values = FALSE,
+                                                      create = T),
+                                   
+                                   # select_phenotype
+                                   selectInput(
+                                     inputId="dropdown_tab7a",
+                                     label="Select a physiological parameter",
+                                     choices=names_BAT[!names_BAT%in%"Study.ID"],
+                                     selected = "BMI",
+                                     multiple = FALSE,
+                                     selectize = TRUE,
+                                     width = NULL,
+                                     size = NULL
+                                   ),
+                                   
+                                   actionButton("go_tab7a", "see correlation plot",class = "btn-success"),
+                                   textOutput("text_tab7a"),
+                                   plotOutput(outputId="plot_tab7a",
+                                              width = "400px",
+                                              height = "400px",
+                                              click = NULL,
+                                              dblclick = NULL,
+                                              hover = NULL,
+                                              brush = NULL,
+                                              inline = FALSE)
+                                   
+                          ))),
+    
+    
       
-      #tab 6 Download
+      #tab 8 Download
       tabPanel(titlePanel("Download"),
+  
                textOutput("download1"),
                tags$head(tags$style("#download1{color: black;
                                  font-size: 20px;
                                  
                                  }"
                )),
-               downloadButton("Download1","download protein expression"),
+               a(href="(1) Protein_expression.csv", "Download protein expression", download=NA, target="_blank"),
+               
                textOutput("download2"),
                tags$head(tags$style("#download2{color: black;
                                  font-size: 20px;
                                 
                                  }"
                )),
-               downloadButton("Download2","download lookup table"),
+               a(href="(2) Mouse_lookup_table.csv", "Download look-up table", download=NA, target="_blank"),
+               
                textOutput("download3"),
                tags$head(tags$style("#download3{color: black;
                                  font-size: 20px;
                                  
                                  }"
                )),
-               downloadButton("Download3","download edges"),
+               a(href="(3) Edges_in_DOBAT_network.csv", "Download edges", download=NA, target="_blank"),
+               
+               
                textOutput("download4"),
                tags$head(tags$style("#download4{color: black;
                                  font-size: 20px;
                                  
                                  }"
                )),
-               downloadButton("Download4","download accessory proteins"),
+               a(href="(4) New_accessory_proteins_to_corum_complexes.tsv", "Download complex accessory proteins", download=NA, target="_blank"),
+               
                textOutput("download5"),
                tags$head(tags$style("#download5{color: black;
                                  font-size: 20px;
                                  
                                  }"
                )),
-               downloadButton("Download5","download physiological data"),
+               a(href="(5) New_accessory_proteins_to_KEGG_pathways.csv", "Download pathway accessory proteins", download=NA, target="_blank"),
+               
                textOutput("download6"),
                tags$head(tags$style("#download6{color: black;
                                  font-size: 20px;
                                  
                                  }"
                )),
-               downloadButton("Download6","download protein-physiology correlations")
+               a(href="(6) Physiological_data.csv", "Download phenotypic data", download=NA, target="_blank"),
+               
+               textOutput("download7"),
+               tags$head(tags$style("#download7{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(7) Protein_physiological_data_correlations.csv", "Download protein-phenotype correlation", download=NA, target="_blank"),
+               
+               textOutput("download8"),
+               tags$head(tags$style("#download8{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(8) Strains_for_phenotypes.csv", "Download strains mapping for phenotypes", download=NA, target="_blank"),
+               
+               textOutput("download9"),
+               tags$head(tags$style("#download9{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(9) Phenotype_QTLs.csv", "Download phenotype QTLs", download=NA, target="_blank"),
+               
+               textOutput("download10"),
+               tags$head(tags$style("#download10{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(10) Protein_QTLs.csv", "Download pQTLs", download=NA, target="_blank"),
+               
+               textOutput("download11"),
+               tags$head(tags$style("#download11{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(11) Human_SCVAT.csv", "Download human SCVAT transcript-phenotype correlations", download=NA, target="_blank"),
+               
+               textOutput("download12"),
+               tags$head(tags$style("#download12{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(12) Human_SAT.csv", "Download human SAT transcript-phenotype correlations", download=NA, target="_blank"),
+               
+               textOutput("download13"),
+               tags$head(tags$style("#download13{color: black;
+                                 font-size: 20px;
+                                 
+                                 }"
+               )),
+               a(href="(13) Disease_networks.csv", "Download disease networks", download=NA, target="_blank")
+               
 ),
      
       
-      #tab 8 Acknowledgments
-      tabPanel(titlePanel("Acknowledgment"),
-               tags$h1("Acknowledgement"),
-               HTML("<p> This project is a collaboration across the <a href='https://chouchanilab.dana-farber.org/'> Chouchani</a>, 
+      #tab 9 Acknowledgments
+tabPanel(titlePanel("Acknowledgment"),
+         tags$h1("Acknowledgement"),
+         HTML("<p> This project is a collaboration across the <a href='https://chouchanilab.dana-farber.org/'> Chouchani</a>, 
                <a href='https://gygi.hms.harvard.edu/index.html'> Gygi</a>,
-                    and <a href='https://spiegelmanlab.dana-farber.org'> Spiegelman </a> labs at 
-                    <a href='https://www.dana-farber.org'> Dana-Farber Cancer Institute </a> and 
-                    <a href='https://hms.harvard.edu'> Harvard Medical School</a>. Please email Dr. Chouchani (edwardt_chouchani@dfci.harvard.edu) if you have questions for this website."),
-               HTML("<p> The web application is developed by Haopeng Xiao and Jiaming Li from the <a href='https://chouchanilab.dana-farber.org/'> Chouchani</a> and 
-               <a href='https://gygi.hms.harvard.edu/index.html'> Gygi</a> labs, the source codes are deposited on GitHub (<a href='https://github.com/Angrycodeboy'>https://github.com/Angrycodeboy/DOBAT</a>)."),
-               HTML("<p> This project is funded by <a href='https://www.calicolabs.com'> Calico Life Sciences LLC</a> and 
-                    <a href='https://www.nih.gov'> National Institute of Health</a>.")
+               <a href='http://churchill-lab.jax.org/website/'> Churchill</a>,
+                <a href='https://spiegelmanlab.dana-farber.org'> Spiegelman</a>,
+                <a href='https://calicolabs.com/people/fiona-mcallister-ph-d'> McAllister</a>,
+                <a href='https://www.calicolabs.com/people/nick-van-bruggen-ph-d'> van Bruggen</a>,
+               <a href='https://nutrition.ucdavis.edu/people/maria-chondronikola'> Chondronikola</a>,
+               <a href='http://evanrosenlab.com'> Rosen</a>,
+               <a href='https://cohenlab.rockefeller.edu'> Cohen</a>,
+               <a href='https://www.tsailab.com/research'> Tsai</a>,
+               <a href='https://yhtsenglab.org'> Tseng</a>,
+                    and <a href='https://bankslab.com'> Banks</a> labs at 
+                    <a href='https://www.dana-farber.org'> Dana-Farber Cancer Institute</a>,
+                    <a href='https://rockefeller.edu'> The Rockefeller University</a>,
+                    <a href='https://www.bidmc.org'> Beth Israel Deaconess Medical Center</a>,
+                    <a href='https://www.jax.org'> The Jackson Laborotory</a>,
+                     <a href='https://www.ucdavis.edu'> UC Davis</a>,
+                     <a href='https://www.joslin.org'> Joselin Diabetes Center</a>,
+                     and <a href='https://hms.harvard.edu'> Harvard Medical School</a>,
+                    along with <a href='https://www.calicolabs.com'> Calico Life Sciences LLC</a>."),
+         HTML("<p> The OPABAT web application is developed by Haopeng Xiao and Jiaming Li from the <a href='https://chouchanilab.dana-farber.org/'> Chouchani</a> and
+         <a href='https://gygi.hms.harvard.edu/index.html'> Gygi</a> labs. The website is maintained by Nathan Bulloch. Source codes are deposited on GitHub (<a href='https://github.com/Angrycodeboy'>https://github.com/Angrycodeboy/OPABAT</a>).
+              The full visualization of <a href='https://churchilllab.jax.org/qtlviewer/Chouchani/OPABAT'> QTL mapping</a> is developed by Matthew Vincent from the <a href='http://churchill-lab.jax.org/website/'> Churchill lab</a>."),
+         HTML("<p> This project is funded by <a href='https://www.calicolabs.com'> Calico Life Sciences LLC</a> and 
+                    <a href='https://www.nih.gov'> National Institute of Health</a>."),
+         HTML("<p> Please contact Haopeng Xiao (haopeng_xiao@dfci.harvard.edu) for bug report.")
+         
                
       )
     )
@@ -395,26 +570,15 @@ credentials <- data.frame(
     # below is the traditional app server
     
     ##below is for tab0
-    output$Welcome<-renderText({
-      "Welcome to ProPhysDOBAT!"
-    })
     output$image_tab1 <- renderImage({
-        list(src="data/final/ProphysDOBAT.png",width=200,height=180)
-      },
+      list(src="data/final/OPABAT.png",width=240,height=180)
+    },
     deleteFile = FALSE)
-    output$Abstract<-renderText({
-      "Abstract space holder- Obesity is a polygenic disease with variable penetrance in the general population. Brown adipose tissue (BAT) is a major regulator of energy expenditure and metabolic disease.  However, almost all mechanistic studies of BAT function occur in a single inbred mouse strain, which has limited understanding of generalizable mechanisms for resistance to obesity. Here we perform deep quantitative multiplexed proteomics of BAT across a cohort of XX Diversity Outbred (DO) mice, a defined model that parallels the genetic and phenotypic variation found in the human population. By quantifying over 10,000 BAT proteins across the cohort, we define the functional architecture of the outbred BAT proteome. We identify protein correlation networks and use this as a basis to discover and validate novel and essential regulators of BAT thermogenic effectors. Through parallel metabolic phenotyping of the DO cohort during obesogenesis, we also identify key proteins and protein networks that underlie protection from, or sensitivity to, metabolic disease pathogenesis. We provide this outbred proteomic architecture as a framework for understanding conserved mechanisms of BAT regulation over metabolic disease.
-      
-      "
-    })
-    output$Cite<-renderText({
-      "Please cite: space holder-please insert citation here"
-    })
     
     ##below is for tab1
     re_tab1 <-eventReactive( input$go_tab1,{input$gene_tab1})
     output$expression_text<-renderText({
-      gene_text1<-re_tab1()
+      gene_text1<-toupper(re_tab1())
       uni_text1<-db0[db0$gene==gene_text1,]$uni
       if(length(uni_text1)==0){
         print("Please click to select an official gene symbol from the typing helper menu.")
@@ -428,7 +592,7 @@ credentials <- data.frame(
     }})
     
     output$expression_plot<-renderPlot({
-      gene_plot1<-re_tab1()
+      gene_plot1<-toupper(re_tab1())
       pheno<-input$dropdown_tab1
       uni_plot1<-db0[db0$gene==gene_plot1,]$uni
       if(length(uni_plot1)==0){
@@ -465,20 +629,20 @@ credentials <- data.frame(
     ## below is for tab2
     re <-eventReactive( input$go,{c(isolate(input$gene1),isolate(input$gene2))})
     output$network<-renderText({
-      members<-re()
+      members<-toupper(re())
       #test members<-c("UCP1","LETMD1")
       edges<-db
       edges$count<-ifelse((edges$gene_final1 %in% members)&(edges$gene_final2 %in% members),1,0)
       edges<-edges[(edges$count!=0),]
       if(nrow(edges)!=0){
-        paste0("Edge exist in DO BAT correlation network, ","FDR q=",signif(edges$qval,digits=2),", ","mouse n=",edges$n)
+        paste0("Edge exist in OPABAT correlation network, ","FDR q=",signif(edges$qval,digits=2),", ","mouse n=",edges$n)
       }else{
-        paste0("Edge not included in DO BAT network, either due to the edge not existing or not passing FDR cutoff (q>0.05, |r|>0.75, n>50)")}
+        paste0("Edge not included in OPABAT network, either due to the edge not existing or not passing FDR cutoff (q>0.05, |r|>0.75, n>50)")}
     })
     
     output$plot <- renderPlot({
-      x1<-re()[1]
-      x2<-re()[2]
+      x1<-toupper(re()[1])
+      x2<-toupper(re()[2])
       uni1<-db0[db0$gene==x1,]$uni
       uni2<-db0[db0$gene==x2,]$uni
       ggscatter(dft, x = uni1, y = uni2, 
@@ -495,20 +659,20 @@ credentials <- data.frame(
     ## below is for tab3
     re_tab3 <-eventReactive(input$go_tab3,{input$gene_tab3})
     output$text_tab3<-renderText({
-      gene_text3<-re_tab3()
+      gene_text3<-toupper(re_tab3())
       edge_extract1<-all_edges[all_edges$from==gene_text3,]
       edge_extract2<-all_edges[all_edges$to==gene_text3,]
       length_text3<-length(c(edge_extract1$to,edge_extract2$from))
       if(length_text3==0){
         paste0(gene_text3," has no significant correlator.")
       }else{
-      paste0(gene_text3,"'s immediate correlation network contains ",length_text3," significant correlators. 
+      paste0(gene_text3,"'s first-degree neighboring network contains ",length_text3," significant correlators. 
              Zoom in and hover over nodes to see gene symbol and protein description. Hover over edges to see 
              correlation strength and evidence of protein-protein interaction in the literature. Reload the page
              if very large networks slow down the website.")}
     })
     output$plot_tab3 <- renderVisNetwork({
-      gene_plot3<-re_tab3()
+      gene_plot3<-toupper(re_tab3())
       edge_extract1<-all_edges[all_edges$from==gene_plot3,]
       edge_extract2<-all_edges[all_edges$to==gene_plot3,]
       edges<-rbind(edge_extract1,edge_extract2)%>%arrange(desc(value))
@@ -556,7 +720,7 @@ credentials <- data.frame(
     re_tab4a <-eventReactive(input$go_tab4a,{input$gene_tab4a})
     output$text_tab4a<-renderText({
       #for test- gene_text4a<-"PSMC1"
-      gene_text4a<-re_tab4a()
+      gene_text4a<-toupper(re_tab4a())
       #test gene_text4a<-"UCP1"
       corum_tab4a<-corum_filter
       corum_tab4a$subunits.Gene.name.<-str_split(corum_tab4a$subunits.Gene.name.,";")
@@ -591,7 +755,7 @@ credentials <- data.frame(
     })
     
     output$subunit_table <- DT::renderDataTable({
-      gene_text4a<-re_tab4a()
+      gene_text4a<-toupper(re_tab4a())
       #test gene_text4a<-"PSMC1"
       corum_tab4a<-corum_filter
       corum_tab4a$subunits.Gene.name.<-str_split(corum_tab4a$subunits.Gene.name.,";")
@@ -636,7 +800,7 @@ credentials <- data.frame(
     })
     
     output$accessory_table <- DT::renderDataTable({
-      gene_text4a<-re_tab4a()
+      gene_text4a<-toupper(re_tab4a())
       #test gene_text4a<-"PSMC1"
       corum_tab4a<-corum_filter
       corum_tab4a$subunits.Gene.name.<-str_split(corum_tab4a$subunits.Gene.name.,";")
@@ -685,7 +849,7 @@ credentials <- data.frame(
       #for test- gene_text4<-"1895_mTOR complex (MTOR, RICTOR, MLST8)"
       gene_text4<-re_tab4()
       new_member_tab4<-corum_filter[corum_filter$identifier==gene_text4,]$new_member
-      paste0("Corum complex ",gene_text4," has ",new_member_tab4, " new accessory proteins identified in DO BAT network. 
+      paste0("Corum complex ",gene_text4," has ",new_member_tab4, " new accessory proteins identified in OPABAT network. 
              Networks with over 80 members may take longer to show up. Reload the page if very large networks slow down 
              the website.")
     })
@@ -713,7 +877,7 @@ credentials <- data.frame(
       temp1<-as.data.frame(t(temp_t2))%>%unite("edge",c("V1","V2"))
       temp2<-temp1%>%distinct(edge)
       temp2<-temp2%>%
-        mutate( color="orange",
+        mutate( color="darkred",
                title="interaction between corum complex members",
                smooth=TRUE,
                dashes=FALSE,
@@ -733,7 +897,7 @@ credentials <- data.frame(
       temp_t2<- as.data.frame(apply(temp_t, 2, sort))
       temp1<-as.data.frame(t(temp_t2))%>%unite("edge",c("V1","V2"))
       temp3<-inner_join(all_edges,temp1,by=c("label"="edge"))%>%
-        mutate(color="darkred",
+        mutate(color="orange",
                dashes=FALSE)
       ##construct final edge table
       edges_plot4<-rbind(temp2,temp3)
@@ -742,7 +906,7 @@ credentials <- data.frame(
       # for corum members#
       nodes_members_plot4 <- data.frame(id = complex_member_plot4,
                           label = complex_member_plot4,
-                          color = "orange")
+                          color = "darkred")
       nodes_members_plot4_1<-left_join(nodes_members_plot4,db0,by=c("id"="gene"))%>%
         select(id,label,color,Description)%>%
         mutate(title = paste0("<p><b>", "corum complex member"," ",Description, "</b><br>"))%>%
@@ -754,7 +918,7 @@ credentials <- data.frame(
                                         identifier=complex_name_plot4)%>%
         unite("match",c("identifier","label"),remove=F)
       nodes_accessory_plot4a<-left_join(nodes_accessory_plot4,corum_accessor_p,by="match")%>%
-        mutate( color="darkred")%>%
+        mutate( color="orange")%>%
         select(id,label,color,p_adj_BH)
       nodes_accessory_plot4a1<-left_join(nodes_accessory_plot4a,db0,by=c("id"="gene"))%>%
         select(id,label,color,Description,p_adj_BH)%>%
@@ -789,7 +953,7 @@ credentials <- data.frame(
         dplyr::rename("PearsonR"=all_of(pheno_tab5))%>%
         dplyr::filter(PearsonR >=0.4|PearsonR <=-0.4)
       cor_number_tab5<-nrow(df_tab5)
-      paste0("Physiological parameter ",pheno_tab5," has ",cor_number_tab5, " significant protein correlators (Pearson r ≥ 0.4 or ≤ -0.4, Mouse Number ≥ 81).")
+      paste0("Physiological parameter ",pheno_tab5," has ",cor_number_tab5, " significant protein correlators (Pearson r ≥ 0.4 or ≤ -0.4, p<0.05, Mouse Number ≥ 81).")
       })
     output$pos_table <- DT::renderDataTable({
       pheno_tab5_a<-re_tab5()
@@ -815,7 +979,7 @@ credentials <- data.frame(
     ## the bottom half of the tab below ##
     re_tab5a <-eventReactive( input$go_tab5a,{input$gene_tab5a})
     output$text_tab5a<-renderText({
-      gene_text5a<-re_tab5a()
+      gene_text5a<-toupper(re_tab5a())
       #test gene_text5a<-"UCP1"
       uni_text5a<-db0[db0$gene==gene_text5a,]$uni
       if(length(uni_text5a)==0){
@@ -830,13 +994,13 @@ credentials <- data.frame(
       }})
     
     output$plot_tab5a<-renderPlot({
-      gene_plot5a<-re_tab5a()
+      gene_plot5a<-toupper(re_tab5a())
       pheno5a<-input$dropdown_tab5a
       uni_plot5a<-db0[db0$gene==gene_plot5a,]$uni
       if(length(uni_plot5a)==0){
         print("Please use official gene symbol found on UniProt (uniprot.org).")
       }else{
-        #test gene_plot5a<-"LEP" pheno5a<-"body.weight"
+        #test gene_plot5a<-"LEP" pheno5a<-"fat.percent.week8"
         df_plot5a<-df2[df2$uni==uni_plot5a,]
         df_plot5a$Sample_ID1<-paste0(df_plot5a$M,"_",df_plot5a$ID)
         df_p_plot5a<-df_p[,c("Sample_ID1",pheno5a)]
@@ -852,74 +1016,170 @@ credentials <- data.frame(
                                     fill = "gray"),
                   xlab = paste0("rel. abundance of ",gene_plot5a), ylab = paste0("z-scored value of ",pheno5a))
       }}, res = 96)
+
     
- ###tab 6 below###
+    
+#below is for tab6- Strain selection#
+    re_tab6 <-eventReactive( input$go_tab6,{input$dropdown_tab6})
+    output$text_tab6<-renderText({
+      pheno_tab6<-re_tab6()
+      # test pheno_tab6<-"VO2 cold/day"
+      df_tab6<-df_strain%>%
+        dplyr::filter(Parameter==pheno_tab6)%>%
+        arrange(Allelic.contribution)
+      df_tab6_sort<-na.omit(df_tab6)
+      
+      most_neg<-df_tab6_sort[1,]$Founder.strain
+      most_pos<-df_tab6_sort[nrow(df_tab6_sort),]$Founder.strain
+      
+      paste0(most_neg," has the most negative founder allelic contribution to ",pheno_tab6, "; ", most_pos, " has the most positive founder allelic contribution to ",pheno_tab6, ".")
+    })
+    output$strain_table <- DT::renderDataTable({
+      pheno_tab6_a<-re_tab6()
+      #test pheno_tab6_a<-"VO2 cold/day"
+      df_tab6_a<-df_strain%>%
+        dplyr::filter(Parameter==pheno_tab6_a)%>%
+        arrange(Allelic.contribution)
+      DT::datatable(df_tab6_a,options = list(
+        autoWidth = TRUE,
+        columnDefs = list(list(targets=c(3), visible=TRUE, width='300px'),
+                          list(targets=c(4), visible=TRUE, width='300px'),
+                          list(targets=c(5), visible=TRUE, width='300px'),
+                          list(className = 'dt-center',targets = c(2,3)))))
+    })  
+    
+    #below is for tab7#
+    re_tab7 <-eventReactive( input$go_tab7,{input$dropdown_tab7})
+    output$text_tab7<-renderText({
+      pheno_tab7<-re_tab7()
+      # test pheno_tab7<-"BMI"
+      df_tab7<-df_human_cor[,c("Gene.symbol",pheno_tab7,paste0(pheno_tab7,".pval"),"Description")]%>%
+        dplyr::rename("PearsonR"=all_of(pheno_tab7),"Pval"=all_of(paste0(pheno_tab7,".pval")))%>%
+        dplyr::filter(PearsonR >=0.4|PearsonR <=-0.4)%>%
+        dplyr::filter(Pval <0.05)
+      cor_number_tab7<-nrow(df_tab7)
+      paste0("Human phenotype ",pheno_tab7," has ",cor_number_tab7, " significant transcript correlators (Pearson r ≥ 0.4 or ≤ -0.4, p value < 0.05) mapped as significant protein correlators of at least one of the 33 phenotypes measured in OPABAT.")
+    })
+    output$human_table <- DT::renderDataTable({
+      pheno_tab7_a<-re_tab7()
+      #test pheno_tab7_a<-"BMI"
+      human<-df_human_cor[,c("Gene.symbol",pheno_tab7_a,paste0(pheno_tab7_a,".pval"),"Description")]%>%
+        dplyr::rename("PearsonR"=all_of(pheno_tab7_a),"Pval"=all_of(paste0(pheno_tab7_a,".pval")))%>%
+        dplyr::filter(PearsonR >=0.4|PearsonR <=-0.4)%>%
+        dplyr::filter(Pval <0.05)%>%
+        arrange(PearsonR)%>%
+        mutate(PearsonR=round(PearsonR,digits=3))%>%
+        dplyr::rename("Pearson r"="PearsonR")
+      DT::datatable(human)
+    })
+    ## the bottom half of the tab below ##
+    re_tab7a <-eventReactive( input$go_tab7a,{input$gene_tab7a})
+    output$text_tab7a<-renderText({
+      gene_text7a<-toupper(re_tab7a())
+      #test gene_text7a<-"NDUFC2"
+      uni_text7a<-db0[db0$gene==gene_text7a,]$uni
+      
+      if(!(gene_text7a%in%(df_human_BAT$Gene.symbol))){
+        print(paste0(gene_text7a, " is not detected or not recapitulated as a human SCVAT transcript-phenotype correlator."))
+      }else{
+        dfp_sig_pro<-dfp_sig%>%filter(Uniprot.Accession==uni_text7a)
+        dfp_sig_pro1<-dfp_sig_pro[,3:35]
+        dfp_sig_pro1_t<-as.data.frame(t(dfp_sig_pro1))
+        dfp_sig_pro1_t$params<-rownames(dfp_sig_pro1_t)
+        dfp_sig_pro1_t1<-dfp_sig_pro1_t%>%filter(V1 >=0.4|V1 <=-0.4)
+        hit_params<-toString(dfp_sig_pro1_t1$params)
+        
+        paste0(gene_text7a, " is a OPABAT protein-phenotype correlator of ", hit_params, ". Currently displaying its human SCVAT transcript-phenotype correlation.")}
+      })
+    
+    output$plot_tab7a<-renderPlot({
+      gene_plot7a<-toupper(re_tab7a())
+      pheno7a<-input$dropdown_tab7a
+      uni_plot7a<-db0[db0$gene==gene_plot7a,]$uni
+      if(!(gene_plot7a%in%(df_human_BAT$Gene.symbol))){
+        print(paste0(gene_plot7a, " is not detected or not recapitulated as a human SCVAT transcript-phenotype correlator."))
+      }else{
+        #test gene_plot7a<-"NDUFC2" pheno7a<-"BMI"
+        df_plot7_transcript<-df_human_BAT%>%filter(Gene.symbol==all_of(gene_plot7a))
+        df_plot7_pheno<-df_human_pheno%>%select(Study.ID,all_of(pheno7a))
+        pheno_values<-df_plot7_pheno[,2]
+        pheno_zscore<-as.data.frame(scale(pheno_values))
+        df_plot7_pheno1<-cbind(df_plot7_pheno,pheno_zscore)
+        
+        
+        df_plot7_transcript_t<-as.data.frame(t(df_plot7_transcript))
+        df_plot7_transcript_t$"Study.ID"<-rownames(df_plot7_transcript_t)
+        df_plot7_transcript_t1<-df_plot7_transcript_t[-1,]
+
+        data_plot7a<-left_join(df_plot7_transcript_t1,df_plot7_pheno1,by="Study.ID")
+        data_plot7a$V1.x<-as.numeric(data_plot7a$V1.x)
+        
+        ggscatter(data_plot7a, x = "V1.x", y = "V1.y", 
+                  add = "reg.line", conf.int = TRUE, 
+                  conf.int.level = 0.95,
+                  cor.coef = TRUE, cor.method = "pearson",
+                  color = "black", 
+                  alpha=0.65,
+                  add.params = list(color = "darkred",
+                                    fill = "gray"),
+                  xlab = paste0("rel. abundance (TPM) of ",gene_plot7a), ylab = paste0("z-scored value of ",pheno7a))
+      }}, res = 96)   
+    
+        
+ ###tab 8 below###
     output$download1<-renderText({
-      "Download BAT protein expression data across the whole DO cohort."
+      "(1) BAT protein expression data across the whole DO cohort."
     })
-    output$Download1 <- downloadHandler(
-      filename = function() {
-        "(1) Protein_expression.csv"
-      },
-      content = function(file) {
-        write.csv(d1, file)
-      }
-    )
+    
     output$download2<-renderText({
-      "Download the naming/labeling system of all the mice in the DO cohort."
+      "(2) A look-up table for the naming/labeling system of all the mice in the DO cohort."
     })
-    output$Download2 <- downloadHandler(
-      filename = function() {
-       "(2) Mouse_lookup_table.csv"
-      },
-      content = function(file) {
-        write.csv(d2, file)
-      }
-    )
+   
     output$download3<-renderText({
-      "Download all the significant protein-protein correlations found in DO BAT and and evidence in the literature."
+      "(3) Significant protein-protein correlations found in OPABAT and evidence for correlation in the literature."
     })
-    output$Download3 <- downloadHandler(
-      filename = function() {
-        "(3) Edges_in_DOBAT_network.csv"
-      },
-      content = function(file) {
-        write.csv(d3, file)
-      }
-    )
+    
     output$download4<-renderText({
-      "Download all the significant proteins in DO BAT accessory to established CORUM complexes."
+      "(4) Proteins in OPABAT that are significantly co-operative to established CORUM complexes."
     })
-    output$Download4 <- downloadHandler(
-      filename = function() {
-        "(4) New_accessory_proteins_to_corum_complexes.csv"
-      },
-      content = function(file) {
-        write.csv(d4, file)
-      }
-    )
+    
     output$download5<-renderText({
-      "Download all physiological data for all DO mice."
+      "(5) Proteins in OPABAT that are significantly co-operative to established KEGG pathways."
     })
-    output$Download5 <- downloadHandler(
-      filename = function() {
-       "(5) Physiological_data.csv"
-      },
-      content = function(file) {
-        write.csv(d5, file)
-      }
-    )
+    
     output$download6<-renderText({
-      "Download the correlation table between protein expression and physiological data."
+      "(6) Phenotypic data for all DO mice."
     })
-    output$Download6 <- downloadHandler(
-      filename = function() {
-        "(6) Protein_physiological_data_correlations.csv"
-      },
-      content = function(file) {
-        write.csv(d6, file)
-      }
-    )
+    
+    output$download7<-renderText({
+      "(7) Correlation between protein expression and phenotypic data."
+    })
+    
+    output$download8<-renderText({
+      "(8) Strain mapping information to model phenotypes."
+    })
+    
+    output$download9<-renderText({
+      "(9) Phenotype QTLs found in OPABAT."
+    })
+   
+    output$download10<-renderText({
+      "(10) Protein QTLs found in OPABAT."
+    })
+    
+    output$download11<-renderText({
+      "(11) Correlations between phenotypes and Human SCVAT transcripts of OPABAT metabolic phenotype correlators."
+    })
+    
+    output$download12<-renderText({
+      "(12) Correlations between phenotypes and Human SAT transcripts of OPABAT metabolic phenotype correlators."
+    })
+    
+    output$download13<-renderText({
+      "(13) Mapping of OPABAT metabolic phenotype correlators onto human disease networks."
+    })
+    
+    
   }
   
   shinyApp(ui, server)
