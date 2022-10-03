@@ -84,12 +84,3 @@ t = setTimeout(logout, 120000);  // time is in milliseconds (1000 is 1 second)
 }
 idleTimer();"
 
-
-
-# data.frame with credentials info
-credentials <- data.frame(
-  user = "dobat",
-  password = "dobat",
-  # comment = c("protein","physiology"), %>% 
-  stringsAsFactors = FALSE
-)
