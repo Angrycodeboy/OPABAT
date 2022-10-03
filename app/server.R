@@ -1,9 +1,4 @@
 server <- function(input, output, session) {
-  result_auth <- secure_server(check_credentials = check_credentials(credentials))
-  
-  output$res_auth <- renderPrint({
-    reactiveValuesToList(result_auth)
-  })
   # below is the traditional app server
   
   ##below is for tab0
