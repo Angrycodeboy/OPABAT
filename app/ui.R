@@ -1,5 +1,4 @@
-secure_app(head_auth = tags$script(inactivity), 
-                      fluidPage(
+fluidPage(
     navlistPanel(#widths = c(4, 6),
 
       #tab 0 Homepage
@@ -457,5 +456,4 @@ tabPanel(titlePanel("Acknowledgment"),
                
       )
     )
-  )
 )

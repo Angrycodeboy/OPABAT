@@ -17,7 +17,6 @@ RUN install2.r --error --skipinstalled \
     png \
     DT \
     gsubfn \
-    shinymanager \
     igraph \
     feather
 

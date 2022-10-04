@@ -6,7 +6,6 @@ library(png)
 library(dqshiny)
 library(DT)
 library(gsubfn)
-library(shinymanager)
 library(feather)
 
 ##read in necessary tables##
