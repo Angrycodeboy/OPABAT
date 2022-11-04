@@ -16,7 +16,7 @@ fluidPage(
            calcium influx-dependent activation of thermogenic effectors. We provide this Outbred Proteomic Architecture of BAT (OPABAT) as a resource to understanding conserved mechanisms of 
            BAT regulation over metabolic physiology."),
       tags$h1("Citation"),
-      HTML("<p>If this website is useful to you, please consider citing <a href='https://www.sciencedirect.com/science/article/pii/S0092867420301562?via%3Dihub'> 'space holder-OPABAT' </a>!</p>"),
+      HTML("<p>If this website is useful to you, please consider citing <a href='https://www.cell.com/cell/fulltext/S0092-8674(22)01318-6#secsectitle0015'> 'Xiao et al., Cell, 2022' </a>!</p>"),
       
       imageOutput("image_tab1"),
       ),
